@@ -90,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void delete_New_Contact(){
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,14 +108,12 @@ public class MainActivity extends AppCompatActivity {
         delete_contact = findViewById(R.id.delete_button);
         add_contact = findViewById(R.id.add_button);
         progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
         db = FirebaseFirestore.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         date = new Date();
 
 
-        //Intent Data
-        intent = new Intent(Intent.ACTION_INSERT);
-        intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
 
 
 
@@ -119,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         add_contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 db = FirebaseFirestore.getInstance();
                 user = new HashMap<>();
                 user.put("Name","User 2");
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         sync_contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 db.collection("users")
                         .whereEqualTo("Date",format.format(date))
                         .get()
@@ -162,14 +164,16 @@ public class MainActivity extends AppCompatActivity {
                                         String Contact = (String) documentSnapshot.get("Contact");
                                         Log.d("Tanmay User",Name+" => "+Contact );
                                         saveNewContact(Name,Contact);
-                                        Toast.makeText(MainActivity.this, "Success "+count, Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(MainActivity.this, "Success "+count, Toast.LENGTH_SHORT).show();
                                         count+=1;
                                     }
+                                    progressBar.setVisibility(View.GONE);
                                 }else{
                                     Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
+
             }
         });
 
