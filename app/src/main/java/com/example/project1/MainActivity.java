@@ -39,6 +39,8 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //Variables initialized
     Button sync_contact;
     Button delete_contact;
     Button add_contact;
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     Date date;
     Intent intent;
 
+
+    //Method To save contacts in device
     public void saveNewContact(String Name,String Phone ){
 
         ArrayList<ContentProviderOperation> cpo = new ArrayList<ContentProviderOperation>();
@@ -99,17 +103,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Title Change for App
         setTitle("Able Contact Sync");
+        // Set Default Theme
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
+        //Requested Permission to Write Contacts
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_CONTACTS}, PackageManager.PERMISSION_GRANTED);
-
+        // Variables initialized
         sync_contact = findViewById(R.id.sync_button);
         delete_contact = findViewById(R.id.delete_button);
         add_contact = findViewById(R.id.add_button);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
+        // Database instance called
         db = FirebaseFirestore.getInstance();
+        // Class used to get Current date
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         date = new Date();
 
@@ -117,16 +125,20 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+        // Add Contact Method for testing and adding new contacts manually
         add_contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Add Contact Button Clicked", Toast.LENGTH_SHORT).show();
+                /*
                 db = FirebaseFirestore.getInstance();
+                // Created a Hash map for passing data onto the firestore
                 user = new HashMap<>();
                 user.put("Name","User 2");
                 user.put("Contact","0284030911");
                 user.put("Date",format.format(date));
 
+                // Adding data to the firebase
                 db.collection("users")
                         .add(user)
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -141,16 +153,19 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                             }
                         });
+                 */
 
             }
         });
 
 
-
+        // Sync Contact Method Implemented
         sync_contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Progress bar initialized onclick
                 progressBar.setVisibility(View.VISIBLE);
+                // Get Current Names and Contacts user added to the Firebase today
                 db.collection("users")
                         .whereEqualTo("Date",format.format(date))
                         .get()
@@ -160,13 +175,16 @@ public class MainActivity extends AppCompatActivity {
                                 int count = 0;
                                 if(task.isSuccessful()){
                                     for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
+                                        // Storing Name and Contact in strings
                                         String Name = (String) documentSnapshot.get("Name");
                                         String Contact = (String) documentSnapshot.get("Contact");
-                                        Log.d("Tanmay User",Name+" => "+Contact );
+                                        //Log.d("Tanmay User",Name+" => "+Contact );
+                                        // Calling Save contact method defined previously
                                         saveNewContact(Name,Contact);
                                         //Toast.makeText(MainActivity.this, "Success "+count, Toast.LENGTH_SHORT).show();
                                         count+=1;
                                     }
+                                    // Disable the progress bar after adding contacts
                                     progressBar.setVisibility(View.GONE);
                                 }else{
                                     Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
@@ -177,12 +195,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Delete Contacts Onclick
         delete_contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
-
+                Toast.makeText(MainActivity.this, "Delete Button Pressed", Toast.LENGTH_SHORT).show();
             }
         });
     }
